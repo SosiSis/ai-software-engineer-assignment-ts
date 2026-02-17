@@ -17,11 +17,11 @@ export class HttpClient {
     const headers = opts?.headers ?? {};
 
     if (api) {
-      // BUG: truthiness + instanceof check misses the "plain object" token case.
-      if (
-        !this.oauth2Token ||
-        (this.oauth2Token instanceof OAuth2Token && this.oauth2Token.expired)
-      ) {
+      // FIX: Ensure we refresh if it's not a valid class instance 
+      // or if that instance is expired.
+      const isValidInstance = this.oauth2Token instanceof OAuth2Token;
+      
+      if (!isValidInstance || (this.oauth2Token as OAuth2Token).expired) {
         this.refreshOAuth2();
       }
 
